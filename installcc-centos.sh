@@ -19,41 +19,30 @@ function newRepo_install(){
 		arch=x86_64
 	fi;
 	if [ "$version" == "release 6" ]; then
-		if [ ! -e ./epel-release-$epelver6.noarch.rpm ]; then
-			wget http://dl.iuscommunity.org/pub/ius/archive/Redhat/6/$arch/epel-release-$epelver6.noarch.rpm
-		fi;
-
-		if [ ! -e ./ius-release-$iusver6.ius.el6.noarch.rpm ]; then
-			wget http://dl.iuscommunity.org/pub/ius/archive/Redhat/6/$arch/ius-release-$iusver6.ius.el6.noarch.rpm
-		fi;
-
-		rpm -ivh epel-release-$epelver6.noarch.rpm ius-release-$iusver6.ius.el6.noarch.rpm;
-		if [ ! -e ./percona-release-0.1-3.noarch.rpm ]; then
-			wget http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
-		fi;
-		rpm -ivh percona-release-0.1-3.noarch.rpm
+		rpm -ivh  http://mirrors.aliyun.com/epel/epel-release-latest-6.noarch.rpm
+		rpm -ivh  http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+		mv /etc/yum.repos.d/remi.repo /etc/yum.repos.d/remi.repo.bak
+	#	cd /etc/yum.repos.d
+		wget -O /etc/yum.repos.d/remi.repo $downloadmirror/remi.repo
+		rpm -ivh http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
+		yum-config-manager --disable mysql55-community
+		yum-config-manager --enable mysql56-community
+		yum-config-manager --disable mysql57-community-dmr
 	else
-		if [ ! -e ./epel-release-$epelver5.noarch.rpm ]; then
-			wget http://dl.iuscommunity.org/pub/ius/archive/Redhat/5/$arch/epel-release-$epelver5.noarch.rpm
-		fi;
-
-		if [ ! -e ./ius-release-$iusver5.ius.el5.noarch.rpm ]; then
-			wget http://dl.iuscommunity.org/pub/ius/archive/Redhat/5/$arch/ius-release-$iusver5.ius.el5.noarch.rpm
-		fi;
-
-		rpm -ivh epel-release-$epelver5.noarch.rpm ius-release-$iusver5.ius.el5.noarch.rpm;
+		echo "Sorry,the UCServer-CC must be installed the Centos 6x"
+		exit 0
 	fi
 
-	sed -i "s/mirrorlist/#mirrorlist/" /etc/yum.repos.d/ius.repo
-	sed -i "s/#baseurl/baseurl/" /etc/yum.repos.d/ius.repo
+#	sed -i "s/mirrorlist/#mirrorlist/" /etc/yum.repos.d/ius.repo
+#	sed -i "s/#baseurl/baseurl/" /etc/yum.repos.d/ius.repo
 }
 
 function yum_install(){
 	#yum -y upgrade
 	yum -y remove php* 
 	yum -y remove asterisk*
-	yum -y install bash openssl openssh-server openssh-clients tcpdump wget mlocate openvpn ghostscript mailx cpan crontabs Percona-Server-client-55 Percona-Server-server-55 glibc gcc-c++ libtermcap-devel newt newt-devel ncurses ncurses-devel libtool libxml2-devel kernel-devel kernel-PAE-devel subversion flex libstdc++-devel libstdc++  unzip sharutils openssl-devel make kernel-header
-	chkconfig mysql on
+	yum -y install bash openssl openssh-server openssh-clients tcpdump wget mlocate openvpn ghostscript mailx cpan crontabs mysql-community-server glibc gcc-c++ libtermcap-devel newt newt-devel ncurses ncurses-devel libtool libxml2-devel kernel-devel kernel-PAE-devel subversion flex libstdc++-devel libstdc++  unzip sharutils openssl-devel make kernel-header zlib-devel
+	chkconfig mysqld on
 	chkconfig crond on
 	service crond start
 }
@@ -85,15 +74,17 @@ function php_install(){
 	if [ -e /etc/php.ini.rpmnew -a ! -e /etc/php.ini ]; then
 		cp /etc/php.ini.rpmnew /etc/php.ini
 	fi
-	yum -y install php55u-fpm php55u-cli pcre-devel php55u-mysql sox php55u-gd php55u-mbstring php55u-ioncube-loader php55u-pecl-redis
-	sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php.ini 
-	sed -i "s/memory_limit = 16M /memory_limit = 128M /" /etc/php.ini 
-	sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 40M /" /etc/php.ini 
-	sed -i "s/post_max_size = 8M/post_max_size = 40M/" /etc/php.ini
-	sed -i '/^error_reporting/c error_reporting = E_ALL & ~E_DEPRECATED' /etc/php.ini
-	sed -i "s/user = apache/user = asterisk/" /etc/php-fpm.d/www.conf
-	sed -i "s/group = apache/group = asterisk/" /etc/php-fpm.d/www.conf
-	chkconfig php-fpm on
+	INIFILE=/opt/remi/php55/root/etc/php.ini
+	WWWFILE=/opt/remi/php55/root/etc/php-fpm.d/www.conf
+	yum -y install php55-php-fpm php55-php-cli pcre-devel php55-php-mysqlnd sox php55-php-gd php55-php-mbstring php55-php-ioncube-loader php55-php-pecl-redis
+	sed -i "s/short_open_tag = Off/short_open_tag = On/" $INIFILE 
+	sed -i "s/memory_limit = 16M /memory_limit = 128M /" $INIFILE
+	sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 40M /" $INIFILE
+	sed -i "s/post_max_size = 8M/post_max_size = 40M/" $INIFILE
+	sed -i '/^error_reporting/c error_reporting = E_ALL & ~E_DEPRECATED' $INIFILE
+	sed -i "s/user = apache/user = asterisk/" $WWWFILE
+	sed -i "s/group = apache/group = asterisk/" $WWWFILE
+	chkconfig php55-php-fpm on
 	echo -e "\e[32mPHP-Fpm Install OK!\e[m"
 }
 function redis_install(){
@@ -610,7 +601,7 @@ EOF
 
 function get_mysql_passwd(){
 	mkdir -p /var/run/mysqld
-	service mysql start
+	service mysqld start
 	while true;do
 		echo -e "\e[32mplease enter your mysql root passwd\e[m";
 		read mysql_passwd;
@@ -653,7 +644,7 @@ function UI() {
 	rm -rf /usr/src/UI
 }
 function MYSQL(){
-	/etc/init.d/mysql stop
+	/etc/init.d/mysqld stop
 	sleep 15
 	rm -rf /etc/my.cnf
 	cd /etc/
@@ -714,9 +705,9 @@ function run() {
 	echo "asterisk ALL = NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 	/bin/rm -rf /tmp/.mysql_root_pw.$$
 	ln -s /var/lib/asterisk/moh /var/lib/asterisk/mohmp3
-	/etc/init.d/php-fpm start
+	/etc/init.d/php55-php-fpm start
 	/etc/init.d/iptables stop
-	MYSQL
+	#MYSQL
 	/etc/init.d/asterccd restart
 	chkconfig --del iptables
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
