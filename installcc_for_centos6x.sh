@@ -320,6 +320,7 @@ function nginx_install(){
 }
 
 function asterisk_install() {
+	yum  install speex speex-devel -y
 	echo -e "\e[32mStarting Install Asterisk\e[m"
 	useradd -u 500 -c "Asterisk PBX" -d /var/lib/asterisk asterisk
 	#Define a user called asterisk.
