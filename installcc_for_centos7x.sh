@@ -25,7 +25,7 @@ function yum_install(){
 	yum -y remove php* 
 	yum -y remove asterisk*
 	yum -y install libpcap-devel libaio bash openssl openssh-server openssh-clients tcpdump wget mlocate openvpn ghostscript mailx cpan crontabs glibc gcc-c++ libtermcap-devel newt newt-devel ncurses ncurses-devel libtool libxml2-devel kernel-devel  subversion flex libstdc++-devel libstdc++  unzip sharutils openssl-devel make kernel-headers
-	yum -y install numactl perl perl-Module-Pluggable perl-Pod-Escapes perl-Pod-Simple perl-libs perl-version
+	yum -y install numactl perl perl-Module-Pluggable perl-Pod-Escapes perl-Pod-Simple perl-libs perl-version nscd
 	yum -y install sqlite-devel libuuid-devel pciutils samba cifs-utils
 	yum -y install speex-tools flac
 	yum -y install hwloc ftp libmicrohttpd gnutls bzip2
@@ -34,6 +34,8 @@ function yum_install(){
 	systemctl restart ntpd
 	systemctl enable ntpd
 	systemctl restart crond
+	systemctl restart nscd
+	systemctl enable nscd
 }
 
 function php_install(){
