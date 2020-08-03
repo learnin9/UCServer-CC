@@ -197,6 +197,8 @@ function asterisk_install() {
 	#This command will install the startup scripts and configure the system (through the use of the chkconfig command) to execute Asterisk automatically at startup.
 	sed -i "s/#AST_USER/AST_USER/" /etc/init.d/asterisk
 	sed -i "s/#AST_GROUP/AST_GROUP/" /etc/init.d/asterisk
+	sed -i "s/;runuser = asterisk/runuser = asterisk/" /etc/asterisk/asterisk.conf
+	sed -i "s/;rungroup = asterisk/rungroup = asterisk/" /etc/asterisk/asterisk.conf
 
 	sed -i 's/;enable=yes/enable=no/' /etc/asterisk/cdr.conf
 	sed -i '/net.ipv4.ip_forward/ s/\(.*= \).*/\11/' /etc/sysctl.conf
