@@ -12,6 +12,10 @@ CentOS_UPDATE(){
 #
 }
 
+function update_repo(){
+	wget -O /etc/yum.repos.d/CentOS-Base.repo https://static.lty.fun/%E5%85%B6%E4%BB%96%E8%B5%84%E6%BA%90/SourcesList/Centos-6-Vault-Aliyun.repo
+}
+
 function newRepo_install(){
 	cd /usr/src
 	version=`cat /etc/issue|grep -o 'release [0-9]\+'`
@@ -780,6 +784,7 @@ function run() {
 	fi
 	. ./ucservercc1
 	/bin/rm -rf ./ucservercc1
+	update_repo
 	newRepo_install
 	yum_install
 	php_install
