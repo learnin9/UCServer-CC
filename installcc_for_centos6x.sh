@@ -13,7 +13,7 @@ CentOS_UPDATE(){
 }
 
 function update_repo(){
-	curl -o /etc/yum.repos.d/CentOS-Base.repo https://static.lty.fun/%E5%85%B6%E4%BB%96%E8%B5%84%E6%BA%90/SourcesList/Centos-6-Vault-Aliyun.repo
+	curl -o /etc/yum.repo.d/CentOS-Base.repo http://qiniucdn.ucserver.org/CentOS-Base.repo
 }
 
 function newRepo_install(){
