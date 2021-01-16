@@ -12,9 +12,7 @@ CentOS_UPDATE(){
 #
 }
 
-function update_repo(){
-	curl -o /etc/yum.repo.d/CentOS-Base.repo http://qiniucdn.ucserver.org/CentOS-Base.repo
-}
+
 
 function newRepo_install(){
 	cd /usr/src
@@ -784,7 +782,6 @@ function run() {
 	fi
 	. ./ucservercc1
 	/bin/rm -rf ./ucservercc1
-	update_repo
 	newRepo_install
 	yum_install
 	php_install
