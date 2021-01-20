@@ -573,6 +573,22 @@ http {
 }
 EOF
 
+cat /etc/logrotate.d/nginx  <<EOF
+/usr/local/nginx/logs/access.log  {
+daily
+rotate 3
+missingok
+dateext
+compress
+delaycompress
+notifempty
+sharedscripts
+postrotate
+    [ -e /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+endscript
+}
+EOF
+
 echo -ne "
 * soft nofile 655360
 * hard nofile 655360
