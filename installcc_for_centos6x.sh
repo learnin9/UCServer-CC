@@ -23,9 +23,9 @@ function newRepo_install(){
 		arch=x86_64
 	fi;
 	if [ "$version" == "release 6" ]; then
-		if [ ! -e ./epel-release-$epelver6.noarch.rpm ]; then
-			rpm -ivh $cdnmirror/epel-release-6-5.noarch.rpm 
-		fi;
+#		if [ ! -e ./epel-release-$epelver6.noarch.rpm ]; then
+#			rpm -ivh $cdnmirror/epel-release-6-5.noarch.rpm 
+#		fi;
 
 		if [ ! -e ./ius-release-$iusver6.ius.el6.noarch.rpm ]; then
 			rpm -ivh  $cdnmirror/ius-release-1.0-14.ius.el6.noarch.rpm
