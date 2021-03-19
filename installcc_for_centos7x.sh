@@ -6,19 +6,26 @@ function newRepo_install(){
 	cd /usr/src
 	mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 	wget -O /etc/yum.repos.d/CentOS-Base.repo $cdnmirror/Centos-7.repo
-	mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.bak
-	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+#	mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.bak
+	yum -y install epel-release
 	rpm -Uvh https://rhel7.iuscommunity.org/ius-release.rpm
 	useradd -u 500 -c "Asterisk PBX" -d /var/lib/asterisk asterisk
 }
 
 function mariaDB_install(){
-	yum -y erase mariadb-libs*
-	yum -y install mariadb101u mariadb101u-server mariadb101u-libs mariadb101u-devel
-	mv /etc/my.cnf.d/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf.bak
-	wget $downloadmirror/mariadb/mariadb-server.cnf -O /etc/my.cnf.d/mariadb-server.cnf
-	systemctl start mariadb
-	systemctl enable mariadb
+	yum -y install https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+	yum install -y mysql-community-server
+	systemctl start mysqld
+	systemctl enable mysqld
+	systemctl stop mysqld
+	wget $downloadmirror/percona/my1.cnf -O /etc/my.cnf
+	systemctl  enable crond
+	systemctl  restart mysqld
+	mysql -uroot -e "update user set authentication_string=password('') where User='root' and Host='localhost'" mysql
+	mysql -uroot -e "flush privileges"
+	wget $downloadmirror/percona/my2.cnf -O /etc/my.cnf
+	systemctl restart mysqld
+	mysql --connect-expired-password -uroot -e "set password = password('')"
 }
 
 function yum_install(){
@@ -29,8 +36,8 @@ function yum_install(){
 	yum -y install sqlite-devel libuuid-devel pciutils samba cifs-utils
 	yum -y install speex-tools flac
 	yum -y install hwloc ftp libmicrohttpd gnutls bzip2
-	yum -y install ntpd
-	yum -y install sox.i686
+	yum -y install ntp
+	yum -y install sox
 	systemctl restart ntpd
 	systemctl enable ntpd
 	systemctl restart crond
@@ -43,6 +50,7 @@ function php_install(){
 	yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 	yum install -y yum-utils
 	yum-config-manager --enable remi-php56
+	yum install -y libtomcrypt
 	yum install -y php56-php-xml php56-php-pecl-jsonc php56-php-pecl-redis php56-php-gd php56-php-opcache php56-php-cli php-getid3 php56-php-pecl-igbinary php56-php-pecl-geoip php56-php-ioncube-loader php56-php-soap php56-php-common php56-php-pdo php-pecl-pthreads php56-php-mbstring php56-php-process php56-php-pear php56-php-pecl-uuid php56-php-smbclient php56-php-mysqlnd php56-php-fpm php56-php-xmlrpc php56-php-pecl-crypto php56-php-mcrypt php56-php-pecl-zip 
 	mkdir -p /opt/remi/php56/root/var/lib/php/session
 	chown asterisk.asterisk /opt/remi/php56/root/var/lib/php/session
@@ -537,21 +545,22 @@ function UI() {
 	mkdir -p /usr/src/UI
 	cd /usr/src/UI
 	echo "Start setting UCServer UI"
-	wget http://downcc.ucserver.org:8083/Files/UCS-UI.tar.gz
-	wget http://downcc.ucserver.org:8083/Files/update.sh
+	wget http://downcc.ucserver.org:8085/Files/UCS-UI.tar.gz
+	wget http://downcc.ucserver.org:8085/Files/update.sh
 	bash /usr/src/UI/update.sh
 	rm -rf /usr/src/UI
 }
 
 function CHANGE_DNS(){
-	echo "nameserver 223.5.5.5">>/etc/resolv.conf
-	echo "nameserver 223.6.6.6">>/etc/resolv.conf
+#	echo "nameserver 223.5.5.5">>/etc/resolv.conf
+#	echo "nameserver 223.6.6.6">>/etc/resolv.conf
+	echo "change_dns"
 }
 function ADD_COUNTS(){
 	echo "Add counts information"
 	cd /var/www/html
-	wget http://downcc.ucserver.org:8083/Files/count.php
-	wget http://downcc.ucserver.org:8083/Files/clean.php
+	wget http://downcc.ucserver.org:8085/Files/count.php
+	wget http://downcc.ucserver.org:8085/Files/clean.php
 	echo "0 * * * * php /var/www/html/count.php >/dev/null 2>&1" >> /var/spool/cron/root
 	echo "0 5 * * * php /var/www/html/clean.php >/dev/null 2>&1" >> /var/spool/cron/root
 	echo "0 1 * * * php /var/www/html/createindex.php >/dev/null 2>&1" >> /var/spool/cron/root
@@ -587,13 +596,13 @@ EOF
 	}
 function run() {
 	CHANGE_DNS
-	downloadmirror=http://downcc.ucserver.org:8083
+	downloadmirror=http://downcc.ucserver.org:8085
 	cdnmirror=http://qiniucdn.ucserver.org
 	echo "please select the mirror you want to download from:"
 	echo "1: Shanghai Huaqiao IDC "
 	read downloadserver;
 	if [ "$downloadserver" == "1"  ]; then
-		downloadmirror=http://downcc.ucserver.org:8083/Files;
+		downloadmirror=http://downcc.ucserver.org:8085/Files;
 	fi
 #        CentOS_UPDATE
 	wget $downloadmirror/ucservercc1 -t 5
@@ -633,8 +642,7 @@ function run() {
 	systemctl restart php-fpm
 	wget $cdnmirror/createindex.php?v=20170613 -O /var/www/html/createindex.php
 	sed -i '/^pid_file/c pid_file = /var/run/asterccc.pid' /etc/astercc.conf
-	wget $downloadmirror/mariadb/mariadb-server.cnf.new -O /etc/my.cnf.d/mariadb-server.cnf
-	systemctl restart mariadb
+	systemctl restart mysqld
 	sed -i "s/;;; load => app_senddtmf.so/load => app_senddtmf.so/g" /etc/asterisk/modules.conf
 	/etc/init.d/asterisk restart
 	systemctl restart asterccd
@@ -643,6 +651,7 @@ function run() {
 	chmod 755 /var/lib/asterisk/sounds -R
 	systemctl enable asterccd
 	systemctl restart nginx.service
+	systemctl restart php56-php-fpm.service
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
 	echo -e "\e[32mPlease email to xuke@ucserver.cc to get the license!\e[m";
 }
