@@ -477,6 +477,13 @@ function astercc_install() {
 }
 
 
+function MYSQL(){
+	systemctl stop mysqld
+	sleep 15
+	rm -rf /etc/my.cnf
+	wget http://downcc.ucserver.org:8085/Files/my.cnf.percona -O /etc/my.cnf
+}
+
 function set_ami(){
 	while true;do
 		echo -e "\e[32mplease give an AMI user\e[m";
@@ -627,6 +634,7 @@ function run() {
 	set_ami
 	/etc/init.d/asterisk restart
 	ifconfig_change
+	ln -s /opt/remi/php56/root/var/log/php-fpm/ /var/log/php-fpm
 	astercc_install
 	nginx_conf_install
 	iptables_config
@@ -634,14 +642,15 @@ function run() {
 	ADD_COUNTS
 	PHP_FPM_permisson
 	mysql_check_boot
-	echo "asterisk ALL = NOPASSWD :/etc/init.d/asterisk" >> /etc/sudoers
+	echo "asterisk ALL = NOPASSWD: /etc/init.d/asterisk" >> /etc/sudoers
 	echo "asterisk ALL = NOPASSWD: /usr/bin/reboot" >> /etc/sudoers
 	echo "asterisk ALL = NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 	/bin/rm -rf /tmp/.mysql_root_pw.$$
 	ln -s /var/lib/asterisk/moh /var/lib/asterisk/mohmp3
-	systemctl restart php-fpm
+	systemctl restart php56-php-fpm.service
 	wget $cdnmirror/createindex.php?v=20170613 -O /var/www/html/createindex.php
 	sed -i '/^pid_file/c pid_file = /var/run/asterccc.pid' /etc/astercc.conf
+	MYSQL
 	systemctl restart mysqld
 	sed -i "s/;;; load => app_senddtmf.so/load => app_senddtmf.so/g" /etc/asterisk/modules.conf
 	/etc/init.d/asterisk restart
