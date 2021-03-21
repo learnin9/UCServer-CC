@@ -96,12 +96,12 @@ function dahdi_install() {
 	echo -e "\e[32mStarting Install DAHDI\e[m"
 	cd /usr/src
 	if [ ! -e ./dahdi-linux-complete-$dahdiver.tar.gz ]; then
-		wget $cdnmirror/Files/dahdi-linux-complete-$dahdiver.tar.gz
+		wget $cdnmirror/Files/dahdi-linux-complete-$dahdiver.tar.gz?v=1 -O dahdi-linux-complete-$dahdiver.tar.gz
 		if [ ! -e ./dahdi-linux-complete-$dahdiver.tar.gz ]; then
-			wget $cdnmirror/Files/dahdi-linux-complete-$dahdiver.tar.gz
+		wget $cdnmirror/Files/dahdi-linux-complete-$dahdiver.tar.gz?v=1 -O dahdi-linux-complete-$dahdiver.tar.gz
 		fi
 	fi
-	tar zxf dahdi-linux-complete-$dahdiver.tar.gz
+	tar zxvf dahdi-linux-complete-$dahdiver.tar.gz
 	if [ $? != 0 ]; then
 		echo -e "fatal: dont have valid dahdi tar package\n"
 		exit 1
@@ -117,9 +117,13 @@ function dahdi_install() {
 	make install
 	make config
   	echo "blacklist netjet" >> /etc/modprobe.d/dahdi.blacklist.conf
-	/etc/init.d/dahdi start
+	ldconfig
 	/usr/sbin/dahdi_genconf
-	systemctl enable dahdi
+	wget $downloadmirror/dahdi -O /etc/init.d/dahdi
+	chmod +x /etc/init.d/dahdi
+	/etc/init.d/dahdi start
+	/sbin/chkconfig dahdi on
+	systemctl daemon-reload
 	echo -e "\e[32mDAHDI Install OK!\e[m"
 }
 
@@ -612,13 +616,13 @@ function run() {
 		downloadmirror=http://downcc.ucserver.org:8085/Files;
 	fi
 #        CentOS_UPDATE
-	wget $downloadmirror/ucservercc1 -t 5
-	if [ ! -e ./ucservercc1 ]; then
+	wget $downloadmirror/ucserver_centos7_1 -t 5
+	if [ ! -e ./ucserver_centos7_1 ]; then
 		echo "failed to get version infromation,please try again"
 		exit 1;
 	fi
-	. ./ucservercc1
-	/bin/rm -rf ./ucservercc1
+	. ./ucserver_centos7_1
+	/bin/rm -rf ./ucserver_centos7_1
 	newRepo_install
 	yum_install
 	mariaDB_install
@@ -653,6 +657,7 @@ function run() {
 	MYSQL
 	systemctl restart mysqld
 	sed -i "s/;;; load => app_senddtmf.so/load => app_senddtmf.so/g" /etc/asterisk/modules.conf
+	systemctl daemon-reload
 	/etc/init.d/asterisk restart
 	systemctl restart asterccd
 	rm -rf /var/www/html/asterCC/app/webroot/js/fckeditor/editor/filemanager/connectors/test.html
