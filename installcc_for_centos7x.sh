@@ -605,6 +605,10 @@ php_value[session.save_path]    = /opt/remi/php56/root/var/lib/php/session
 php_value[soap.wsdl_cache_dir]  = /opt/remi/php56/root/var/lib/php/wsdlcache
 EOF
 	}
+function get_sngrep {
+	wget $downloadmirror/Files/sngrep -O /usr/local/bin/sngrep
+	chmod +x /usr/local/bin/sngrep
+	}
 function run() {
 	CHANGE_DNS
 	downloadmirror=http://downcc.ucserver.org:8085
@@ -666,6 +670,7 @@ function run() {
 	systemctl enable asterccd
 	systemctl restart nginx.service
 	systemctl restart php56-php-fpm.service
+	get_sngrep
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
 	echo -e "\e[32mPlease email to xuke@ucserver.cc to get the license!\e[m";
 }
