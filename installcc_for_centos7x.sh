@@ -670,6 +670,8 @@ function run() {
 	systemctl enable asterccd
 	systemctl restart nginx.service
 	systemctl restart php56-php-fpm.service
+	systemctl disable postfix.service
+	systemctl stop postfix.service
 	get_sngrep
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
 	echo -e "\e[32mPlease email to xuke@ucserver.cc to get the license!\e[m";
