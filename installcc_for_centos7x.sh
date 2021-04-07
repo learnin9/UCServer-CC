@@ -606,7 +606,7 @@ php_value[soap.wsdl_cache_dir]  = /opt/remi/php56/root/var/lib/php/wsdlcache
 EOF
 	}
 function get_sngrep {
-	wget $downloadmirror/Files/sngrep -O /usr/local/bin/sngrep
+	wget http://downcc.ucserver.org:8085/Files/sngrep -O /usr/local/bin/sngrep
 	chmod +x /usr/local/bin/sngrep
 	}
 function run() {
