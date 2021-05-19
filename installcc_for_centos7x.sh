@@ -153,7 +153,7 @@ function nginx_install(){
 	fi
 
 	cd nginx-$nginxver
-	./configure --add-module=/usr/src/nginx-push-stream-module-master --with-http_ssl_module  --user=asterisk --group=asterisk
+	./configure --add-module=/usr/src/nginx-push-stream-module --with-http_ssl_module  --user=asterisk --group=asterisk
 	make
 	make install
 	cat > /lib/systemd/system/nginx.service << EOF
