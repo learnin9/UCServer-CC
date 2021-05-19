@@ -142,11 +142,11 @@ function nginx_install(){
 		exit 1
 	fi
 
-	if [ ! -e ./nginx-push-stream-module-master-20130206.tar.gz ]; then
-		wget $downloadmirror/nginx-push-stream-module-master-20130206.tar.gz
+	if [ ! -e ./nginx-push-stream-module.tar.gz ]; then
+		wget $cdnmirror/nginx-push-stream-module.tar.gz
 	fi
 	
-	tar zxf nginx-push-stream-module-master-20130206.tar.gz
+	tar -zxvf nginx-push-stream-module.tar.gz
 	if [ $? != 0 ]; then
 		echo -e "fatal: dont have valid nginx push tar package\n"
 		exit 1
@@ -414,7 +414,7 @@ http {
         location ~ .*\.(js|css)?$
         {
 	  access_log   off;
-          expires 1d;
+          expires 15d;
         }
 
 #        access_log /var/www/html/asterCC/http-log/access.log main;
