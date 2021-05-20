@@ -283,13 +283,13 @@ function nginx_conf_install(){
 cat >  /usr/local/nginx/conf/nginx.conf << EOF
 #user  nobody;
 worker_processes  auto;
-worker_rlimit_nofile 65535;
+worker_rlimit_nofile 655350;
 
 #error_log  logs/error.log;
 #error_log  logs/error.log  notice;
 #error_log  logs/error.log  info;
 
-pid        /var/run/nginx.pid;
+pid        /run/nginx.pid;
 
 
 events {
@@ -302,15 +302,14 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main  '\$remote_addr - \$remote_user [$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
 
     #access_log  logs/access.log  main;
 
     sendfile        on;
     #tcp_nopush     on;
-    access_log   off;
 
     #keepalive_timeout  0;
     keepalive_timeout  65;
@@ -318,37 +317,28 @@ http {
     client_header_buffer_size 32k;
     large_client_header_buffers 4 32k;
 
-        push_stream_store_messages on;
-        push_stream_shared_memory_size  256M;
-        push_stream_message_ttl  15m;
+    push_stream_store_messages on;
+    push_stream_shared_memory_size  256M;
+    push_stream_message_ttl  15m;
 
-    gzip  on;
-    gzip_min_length 1k;
-    gzip_buffers 16 64k;
-    gzip_http_version 1.1;
-    gzip_comp_level 6;
-    gzip_types text/plain application/x-javascript text/css application/xml;
-    gzip_vary on;
+    #gzip  on;
     server
     {
         listen       80 default;
         client_max_body_size 20M;
         index index.html index.htm index.php;
         root  /var/www/html/asterCC/app/webroot;
-        access_log   off;
 
         location / {
           index index.php;
-          access_log   off;
 
-          if (-f $request_filename) {
+          if (-f \$request_filename) {
             break;
           }
-          if (!-f $request_filename) {
-            rewrite ^/(.+)$ /index.php?url=$1 last;
+          if (!-f \$request_filename) {
+            rewrite ^/(.+)\$ /index.php?url=\$1 last;
             break;
           }
-
   
             location  /agentindesks/pushagent {
                 push_stream_publisher admin;
@@ -359,7 +349,7 @@ http {
                 push_stream_subscriber      long-polling;
                 push_stream_channels_path    \$1;
                 push_stream_message_template                 ~text~;
-                push_stream_longpolling_connection_ttl        60s;
+                push_stream_longpolling_connection_ttl        60s;	
             }
 
             location  /publicapi/pushagent {
@@ -392,20 +382,20 @@ http {
         location ~ /\.ht {
           deny all;
         }
-        location ~ .*\.(php|php5)?$
+        location ~ .*\.(php|php5)?\$
         {
           fastcgi_pass  127.0.0.1:9000;
           fastcgi_index index.php;
           include fastcgi_params;
-          fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  fastcgi_connect_timeout 60;
-                  fastcgi_send_timeout 180;
-                  fastcgi_read_timeout 180;
-                  fastcgi_buffer_size 128k;
-                  fastcgi_buffers 4 256k;
-                  fastcgi_busy_buffers_size 256k;
-                  fastcgi_temp_file_write_size 256k;
-                  fastcgi_intercept_errors on;
+          fastcgi_param  SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+          fastcgi_connect_timeout 60;
+          fastcgi_send_timeout 180;
+          fastcgi_read_timeout 180;
+          fastcgi_buffer_size 128k;
+          fastcgi_buffers 4 256k;
+          fastcgi_busy_buffers_size 256k;
+          fastcgi_temp_file_write_size 256k;
+          fastcgi_intercept_errors on;
         }
 
         location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|wav)$
@@ -413,13 +403,13 @@ http {
           access_log   off;
           expires 15d;
         }
+
         location ~ .*\.(js|css)?$
         {
-          access_log   off;
           expires 1d;
         }
 
-#        access_log /var/www/html/asterCC/http-log/access.log main;
+        access_log /var/www/html/asterCC/http-log/access.log main;
     }
 }
 EOF
