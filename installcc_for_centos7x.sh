@@ -577,7 +577,7 @@ function ADD_COUNTS(){
 	echo "0 * * * * php /var/www/html/count.php >/dev/null 2>&1" >> /var/spool/cron/root
 	echo "0 5 * * * php /var/www/html/clean.php >/dev/null 2>&1" >> /var/spool/cron/root
 	echo "0 1 * * * php /var/www/html/createindex.php >/dev/null 2>&1" >> /var/spool/cron/root
-	echo "0 3 * * * chown asterisk.asterisk /var/spool/asterisk/monitor >/dev/null 2>&1" >> /var/spool/cron/root
+####	echo "0 3 * * * chown asterisk.asterisk /var/spool/asterisk/monitor >/dev/null 2>&1" >> /var/spool/cron/root
 }
 function mysql_check_boot(){
 	PASSWD=`cat /etc/astercc.conf |grep password|awk '{print $3}'|awk 'NR==1'`
