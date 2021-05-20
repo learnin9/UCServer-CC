@@ -302,9 +302,9 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '\$remote_addr - \$remote_user [$time_local] "\$request" '
-                      '\$status \$body_bytes_sent "\$http_referer" '
-                      '"\$http_user_agent" "\$http_x_forwarded_for"';
+    log_format  main  '$remote_addr - $remote_user [] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
     #access_log  logs/access.log  main;
 
@@ -318,9 +318,9 @@ http {
     client_header_buffer_size 32k;
     large_client_header_buffers 4 32k;
 
-	push_stream_store_messages on;
-	push_stream_shared_memory_size  256M;
-	push_stream_message_ttl  15m;
+        push_stream_store_messages on;
+        push_stream_shared_memory_size  256M;
+        push_stream_message_ttl  15m;
 
     gzip  on;
     gzip_min_length 1k;
@@ -335,75 +335,77 @@ http {
         client_max_body_size 20M;
         index index.html index.htm index.php;
         root  /var/www/html/asterCC/app/webroot;
-	access_log   off;
+        access_log   off;
 
         location / {
           index index.php;
-	  access_log   off;
+          access_log   off;
 
-          if (-f \$request_filename) {
+          if (-f $request_filename) {
             break;
           }
-          if (!-f \$request_filename) {
-            rewrite ^/(.+)\$ /index.php?url=\$1 last;
+          if (!-f $request_filename) {
+            rewrite ^/(.+)$ /index.php?url=$1 last;
             break;
           }
-		  location  /agentindesks/pushagent {
-			push_stream_publisher admin;
-			set \$push_stream_channel_id \$arg_channel;
-		  }
 
-		  location ~ /agentindesks/agentpull/(.*) {
-			push_stream_subscriber      long-polling;
-			set \$push_stream_channels_path    \$1;
-			push_stream_message_template                 ~text~;
-			push_stream_longpolling_connection_ttl        60s;	
-		  }
+  
+            location  /agentindesks/pushagent {
+                push_stream_publisher admin;
+                push_stream_channels_path    \$arg_channel;
+            }
 
-		  location  /publicapi/pushagent {
-			push_stream_publisher admin;
-			set \$push_stream_channel_id             \$arg_channel;
-		  }
+            location ~ /agentindesks/agentpull/(.*) {
+                push_stream_subscriber      long-polling;
+                push_stream_channels_path    \$1;
+                push_stream_message_template                 ~text~;
+                push_stream_longpolling_connection_ttl        60s;
+            }
 
-		  location ~ /publicapi/agentpull/(.*) {
-			push_stream_subscriber      long-polling;
-			set \$push_stream_channels_path    \$1;
-			push_stream_message_template         "{\\"text\\":\\"~text~\\",\\"tag\\":~tag~,\\"time\\":\\"~time~\\"}";
-			push_stream_longpolling_connection_ttl        60s;
-			push_stream_last_received_message_tag       \$arg_etag;
-			push_stream_last_received_message_time      \$arg_since;
-		  }
-		
-		  location  /systemevents/pushagent {
-			push_stream_publisher admin;
-			set \$push_stream_channel_id             \$arg_channel;
-		  }
+            location  /publicapi/pushagent {
+                push_stream_publisher admin;
+                push_stream_channels_path    \$arg_channel;
+            }
 
-		  location ~ /systemevents/agentpull/(.*) {
-			push_stream_subscriber      long-polling;
-			set \$push_stream_channels_path    \$1;
-			push_stream_message_template                 ~text~;
-			push_stream_longpolling_connection_ttl        60s;
-		  }
+            location ~ /publicapi/agentpull/(.*) {
+                push_stream_subscriber      long-polling;
+                push_stream_channels_path    \$1;
+                push_stream_message_template         "{\"text\":\"~text~\",\"tag\":~tag~,\"time\":\"~time~\"}";
+                push_stream_longpolling_connection_ttl        60s;
+                push_stream_last_received_message_tag       \$arg_etag;
+                push_stream_last_received_message_time      \$arg_since;
+            }
+            
+            location  /systemevents/pushagent {
+                push_stream_publisher admin;
+                push_stream_channels_path    \$arg_channel;
+            }
+
+            location ~ /systemevents/agentpull/(.*) {
+                push_stream_subscriber      long-polling;
+                push_stream_channels_path    \$1;
+                push_stream_message_template                 ~text~;
+                push_stream_longpolling_connection_ttl        60s;
+            }
         }
 
         location ~ /\.ht {
           deny all;
         }
-        location ~ .*\.(php|php5)?\$
+        location ~ .*\.(php|php5)?$
         {
           fastcgi_pass  127.0.0.1:9000;
           fastcgi_index index.php;
           include fastcgi_params;
-          fastcgi_param  SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-		  fastcgi_connect_timeout 60;
-		  fastcgi_send_timeout 180;
-		  fastcgi_read_timeout 180;
-		  fastcgi_buffer_size 128k;
-		  fastcgi_buffers 4 256k;
-		  fastcgi_busy_buffers_size 256k;
-		  fastcgi_temp_file_write_size 256k;
-		  fastcgi_intercept_errors on;
+          fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                  fastcgi_connect_timeout 60;
+                  fastcgi_send_timeout 180;
+                  fastcgi_read_timeout 180;
+                  fastcgi_buffer_size 128k;
+                  fastcgi_buffers 4 256k;
+                  fastcgi_busy_buffers_size 256k;
+                  fastcgi_temp_file_write_size 256k;
+                  fastcgi_intercept_errors on;
         }
 
         location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|wav)$
@@ -413,8 +415,8 @@ http {
         }
         location ~ .*\.(js|css)?$
         {
-	  access_log   off;
-          expires 15d;
+          access_log   off;
+          expires 1d;
         }
 
 #        access_log /var/www/html/asterCC/http-log/access.log main;
