@@ -654,16 +654,17 @@ function run() {
 	systemctl restart mysqld
 	sed -i "s/;;; load => app_senddtmf.so/load => app_senddtmf.so/g" /etc/asterisk/modules.conf
 	systemctl daemon-reload
-	/etc/init.d/asterisk restart
-	systemctl restart asterccd
 	rm -rf /var/www/html/asterCC/app/webroot/js/fckeditor/editor/filemanager/connectors/test.html
 	chmod 777 /etc/astercc.conf
 	chmod 755 /var/lib/asterisk/sounds -R
-	systemctl enable asterccd
-	systemctl restart nginx.service
-	systemctl restart php56-php-fpm.service
+	systemctl enable astercc
+	systemctl enable asterisk
+	systemctl restart asterisk
+	systemctl restart nginx
+	systemctl restart php56-php-fpm
 	systemctl disable postfix.service
 	systemctl stop postfix.service
+	systemctl restart astercc
 	get_sngrep
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
 	echo -e "\e[32mPlease email to xuke@ucserver.cc to get the license!\e[m";
