@@ -231,7 +231,7 @@ read = system,call,agent
 write = all
 EOF
 	sed -i 's/bindaddr = 0.0.0.0/bindaddr = 127.0.0.1/' /etc/asterisk/manager.conf
-	mdkir -p /var/run/asterisk
+	mkdir -p /var/run/asterisk
 	chown asterisk.asterisk /var/run/asterisk/ -R
 	systemctl enable asterisk
 	echo -e "\e[32mAsterisk Install OK!\e[m"
