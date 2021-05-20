@@ -207,8 +207,8 @@ function asterisk_install() {
 	#This command will create documentation using the doxygen software from comments placed within the source code by the developers. 
 	make config
 	#This command will install the startup scripts and configure the system (through the use of the chkconfig command) to execute Asterisk automatically at startup.
-	sed -i "s/#AST_USER/AST_USER/" /etc/init.d/asterisk
-	sed -i "s/#AST_GROUP/AST_GROUP/" /etc/init.d/asterisk
+	#sed -i "s/#AST_USER/AST_USER/" /etc/init.d/asterisk
+	#sed -i "s/#AST_GROUP/AST_GROUP/" /etc/init.d/asterisk
 	sed -i "s/;runuser = asterisk/runuser = asterisk/" /etc/asterisk/asterisk.conf
 	sed -i "s/;rungroup = asterisk/rungroup = asterisk/" /etc/asterisk/asterisk.conf
 
@@ -448,7 +448,7 @@ function ifconfig_change() {
 }
 
 function astercc_install() {
-	/etc/init.d/asterisk restart
+
 	echo -e "\e[32mStarting Install UCServer-CC\e[m"
 	cd /usr/src
 	if [ ! -e ./astercc-$asterccver.tar.gz ]; then
@@ -633,7 +633,6 @@ function run() {
 	nginx_install
 	get_mysql_passwd
 	set_ami
-	/etc/init.d/asterisk restart
 	ifconfig_change
 	ln -s /opt/remi/php56/root/var/log/php-fpm/ /var/log/php-fpm
 	astercc_install
@@ -643,7 +642,6 @@ function run() {
 	ADD_COUNTS
 	PHP_FPM_permisson
 	mysql_check_boot
-	echo "asterisk ALL = NOPASSWD: /etc/init.d/asterisk" >> /etc/sudoers
 	echo "asterisk ALL = NOPASSWD: /usr/bin/reboot" >> /etc/sudoers
 	echo "asterisk ALL = NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 	/bin/rm -rf /tmp/.mysql_root_pw.$$
