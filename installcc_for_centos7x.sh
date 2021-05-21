@@ -421,7 +421,7 @@ echo -ne "
 " >> /etc/security/limits.conf
 
 echo "fs.file-max = 1572775" >> /etc/sysctl.conf
-echo "net.ipv4.ip_local_port_range = 1024 65000" >> /etc/sysctl.conf
+#echo "net.ipv4.ip_local_port_range = 1024 65000" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_fin_timeout = 45" >> /etc/sysctl.conf
 echo "vm.dirty_ratio=10" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_tw_reuse = 1" >> /etc/sysctl.conf
@@ -587,6 +587,7 @@ pm.max_children =  100
 pm.start_servers = 40
 pm.min_spare_servers = 20
 pm.max_spare_servers = 60
+pm.max_requests = 2048
 pm.process_idle_timeout = 360s
 pm.status_path = /php-status
 slowlog = /opt/remi/php56/root/var/log/php-fpm/www-slow.log
