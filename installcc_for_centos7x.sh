@@ -62,6 +62,7 @@ function php_install(){
 	sed -i '/^error_reporting/c error_reporting = E_ALL & ~E_DEPRECATED' /opt/remi/php56/root/etc/php.ini
 	sed -i "s/user = apache/user = asterisk/" /opt/remi/php56/root/etc/php-fpm.d/www.conf
 	sed -i "s/group = apache/group = asterisk/" /opt/remi/php56/root/etc/php-fpm.d/www.conf
+	sed -i "s/;date.timezone =/date.timezone = Asia\/Shanghai\ /" /opt/remi/php56/root/etc/php.ini
 	rm -rf /usr/bin/php
 	ln -s /opt/remi/php56/root/bin/php /usr/bin/php
 	systemctl start php56-php-fpm
