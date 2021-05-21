@@ -657,13 +657,16 @@ function run() {
 	chmod 755 /var/lib/asterisk/sounds -R
 	systemctl enable astercc
 	systemctl enable asterisk
-	systemctl restart asterisk
 	systemctl restart nginx
 	systemctl restart php56-php-fpm
 	systemctl disable postfix.service
 	systemctl stop postfix.service
-	systemctl restart astercc
 	get_sngrep
+	wget $downloadmirror/astercc.service -O /usr/lib/systemd/system/astercc.service
+	wget $downloadmirror/asterisk.service -O /usr/lib/systemd/system/asterisk.service
+	systemctl daemon-reload
+	systemctl restart asterisk
+	systemctl restart astercc
 	echo -e "\e[32mUCServer-CC installation finish!\e[m";
 	echo -e "\e[32mPlease email to xuke@ucserver.cc to get the license!\e[m";
 }
