@@ -607,7 +607,7 @@ function run() {
 	downloadmirror=http://downcc.ucserver.org:8085
 	cdnmirror=http://qiniucdn.ucserver.org
 	echo "please select the mirror you want to download from:"
-	echo "1: Shanghai Huaqiao IDC "
+	echo "1: Qiniu CDN"
 	read downloadserver;
 	if [ "$downloadserver" == "1"  ]; then
 		downloadmirror=http://downcc.ucserver.org:8085/Files;
