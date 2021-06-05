@@ -410,7 +410,7 @@ http {
           expires 1d;
         }
 
-        access_log /var/www/html/asterCC/http-log/access.log main;
+#        access_log /var/www/html/asterCC/http-log/access.log main;
     }
 }
 EOF
