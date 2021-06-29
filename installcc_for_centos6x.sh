@@ -27,17 +27,17 @@ function newRepo_install(){
 #			rpm -ivh $cdnmirror/epel-release-6-5.noarch.rpm 
 #		fi;
 
-		if [ ! -e ./ius-release-$iusver6.ius.el6.noarch.rpm ]; then
-			rpm -ivh  $cdnmirror/ius-release-1.0-14.ius.el6.noarch.rpm
-		fi;
+#		if [ ! -e ./ius-release-$iusver6.ius.el6.noarch.rpm ]; then
+#			rpm -ivh  $cdnmirror/ius-release-1.0-14.ius.el6.noarch.rpm
+#		fi;
 
 		if [ ! -e ./percona-release-0.1-3.noarch.rpm ]; then
 			rpm -ivh $cdnmirror/percona-release-0.1-3.noarch.rpm
 		fi;
 	fi
 
-	sed -i "s/mirrorlist/#mirrorlist/" /etc/yum.repos.d/ius.repo
-	sed -i "s/#baseurl/baseurl/" /etc/yum.repos.d/ius.repo
+#	sed -i "s/mirrorlist/#mirrorlist/" /etc/yum.repos.d/ius.repo
+#	sed -i "s/#baseurl/baseurl/" /etc/yum.repos.d/ius.repo
 }
 
 function yum_install(){
