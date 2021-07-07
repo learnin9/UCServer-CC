@@ -55,9 +55,9 @@ function yum_install(){
 	chkconfig ntpd on
 	cd /usr/src
 	rm -rf Percona*.rpm*
-        wget  $cdnmirror/percona/Percona-Server-client-57-5.7.12-5.1.el6.x86_64.rpm
-        wget  $cdnmirror/percona/Percona-Server-server-57-5.7.12-5.1.el6.x86_64.rpm
-        wget  $cdnmirror/percona/Percona-Server-shared-57-5.7.12-5.1.el6.x86_64.rpm
+        wget  $cdnmirror/Percona-Server-client-57-5.7.34-37.1.el6.x86_64.rpm
+        wget  $cdnmirror/Percona-Server-server-57-5.7.34-37.1.el6.x86_64.rpm
+        wget  $cdnmirror/Percona-Server-client-57-5.7.34-37.1.el6.x86_64.rpm
 	rpm -ivh Percona*.rpm
 	wget $downloadmirror/percona/my1.cnf -O /etc/my.cnf
 #	chkconfig --level 2345 mysql on
